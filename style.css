@@ -1,0 +1,39 @@
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+}
+
+.toolbar{
+    background:#1f2937;
+    color:white;
+    padding:15px;
+}
+
+#mapContainer{
+    position:relative;
+    width:1200px;
+    margin:20px auto;
+}
+
+#layoutImage{
+    width:1200px;
+    display:block;
+}
+
+#map{
+    position:absolute;
+    top:0;
+    left:0;
+    width:1200px;
+    height:1800px;
+}
+
+rect{
+    cursor:pointer;
+}
+#addPlotBtn{
+    margin-top:10px;
+    padding:8px 15px;
+    cursor:pointer;
+    font-weight:bold;
+}

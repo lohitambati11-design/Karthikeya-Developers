@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Veerabhadrapuram Layout</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<div class="toolbar">
+    <h2>Nagarajukunta Phase 2 Layout</h2>
+
+    <div>
+        Available: <span id="availableCount">5</span> |
+        Booked: <span id="bookedCount">0</span> |
+        Sold: <span id="soldCount">0</span>
+    </div>
+
+    <div id="coordinates">
+        X: 0 | Y: 0
+    </div>
+
+    <button id="addPlotBtn">
+        Add Plot Mode: OFF
+    </button>
+</div>
+
+
+
+<div id="mapContainer">
+
+<img id="layoutImage" src="layout.jpg" alt="Layout">
+
+<svg id="map" viewBox="0 0 1500 2000">
+
+
+</svg>
+</div>
+<script src="plots.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
