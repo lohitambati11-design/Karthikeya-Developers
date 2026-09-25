@@ -214,18 +214,20 @@ async function saveCustomer(){
         return;
 
     const customerName =
-        document.getElementById(
-            "customerInput"
-        ).value.trim();
+    document.getElementById(
+        "customerInput"
+    ).value.trim();
 
     selectedPlot.customer =
-        customerName;
+    customerName;
 
     await savePlots();
 
     document.getElementById(
         "popupCustomer"
     ).innerText = customerName;
+
+    await loadPlots();
 
     alert("Customer Saved");
 
@@ -240,11 +242,15 @@ async function setStatus(status){
 
     await savePlots();
 
+    document.getElementById(
+        "popupStatus"
+    ).innerText = status;
+
     drawPlots();
 
-    showPlotPopup(selectedPlot);
-
 }
+
+
 
 /* ==========================
    DRAW PLOTS
