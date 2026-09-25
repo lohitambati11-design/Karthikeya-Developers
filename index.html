@@ -22,22 +22,121 @@
         X: 0 | Y: 0
     </div>
 
-    <button id="addPlotBtn">
-        Add Plot Mode: OFF
-    </button>
+    <div style="margin-top:10px;">
+
+        <input
+            type="number"
+            id="searchPlot"
+            placeholder="Enter Plot No">
+
+        <button id="searchBtn">
+            Search Plot
+        </button>
+        <button id="adminBtn">
+    Admin Login
+</button>
+
+    </div>
 </div>
+<div id="legendBox">
 
+    <table>
 
+        <tr>
+            <th>Colour</th>
+            <th>Status</th>
+        </tr>
 
+        <tr>
+            <td>
+                <div class="legend-color available"></div>
+            </td>
+            <td>Available</td>
+        </tr>
+
+        <tr>
+            <td>
+                <div class="legend-color booked"></div>
+            </td>
+            <td>Booked</td>
+        </tr>
+
+        <tr>
+            <td>
+                <div class="legend-color sold"></div>
+            </td>
+            <td>Sold</td>
+        </tr>
+
+    </table>
+
+</div>
 <div id="mapContainer">
 
-<img id="layoutImage" src="layout.jpg" alt="Layout">
+    <img id="layoutImage" src="layout.jpg" alt="Layout">
 
-<svg id="map" viewBox="0 0 1500 2000">
+    <svg id="map" viewBox="0 0 1500 2000">
 
+    </svg>
 
-</svg>
 </div>
+
+<!-- Popup -->
+
+<div id="plotPopup" class="popup">
+
+    <div class="popup-content">
+
+        <span id="closePopup" onclick="closePopup()">&times;</span>
+
+        <h3>Plot Details</h3>
+
+        <p><b>Plot No:</b> <span id="popupPlotNo"></span></p>
+
+        <p><b>Status:</b> <span id="popupStatus"></span></p>
+
+        <p><b>Customer:</b> <span id="popupCustomer"></span></p>
+
+        <p><b>Extent:</b> <span id="popupExtent"></span></p>
+
+        <p><b>Facing:</b> <span id="popupFacing"></span></p>
+       <div id="adminSection" style="display:none; margin-top:15px;">
+
+    <h4>Admin Controls</h4>
+
+    <div style="margin-bottom:10px;">
+        <label>Customer Name:</label><br>
+
+        <input
+            type="text"
+            id="customerInput"
+            placeholder="Enter Customer Name">
+    </div>
+
+    <button onclick="saveCustomer()">
+        Save Customer
+    </button>
+
+    <hr>
+
+    <button onclick="setStatus('available')">
+        Available
+    </button>
+
+    <button onclick="setStatus('booked')">
+        Booked
+    </button>
+
+    <button onclick="setStatus('sold')">
+        Sold
+    </button>
+
+</div>
+
+    </div>
+
+</div>
+
 <script src="plots.js"></script>
 <script src="app.js"></script>
 

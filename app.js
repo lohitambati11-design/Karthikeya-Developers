@@ -1,6 +1,7 @@
 const svg = document.getElementById("map");
 
-let nextPlotId = 1;
+let isAdmin = false;
+let selectedPlot = null;
 
 function updateCounts() {
 
@@ -25,10 +26,12 @@ function updateCounts() {
 }
 
 function savePlots() {
+
     localStorage.setItem(
         "nagarajukuntaPlots",
         JSON.stringify(plots)
     );
+
 }
 
 function loadPlots() {
@@ -48,12 +51,116 @@ function loadPlots() {
             );
 
             if(plot){
-                plot.status = savedPlot.status;
+
+                plot.status =
+savedPlot.status || "available";
+
+plot.customer =
+savedPlot.customer || "";
+
             }
 
         });
 
     }
+
+}
+
+function showPlotPopup(plot){
+selectedPlot = plot;
+    document.getElementById(
+        "popupPlotNo"
+    ).innerText = plot.id;
+
+    document.getElementById(
+        "popupStatus"
+    ).innerText = plot.status;
+
+    document.getElementById(
+        "popupCustomer"
+    ).innerText =
+    plot.customer || "N/A";
+    const customerInput =
+document.getElementById("customerInput");
+
+if(customerInput){
+    customerInput.value =
+    plot.customer || "";
+}
+
+    document.getElementById(
+        "popupExtent"
+    ).innerText =
+    plot.extent || "N/A";
+
+    document.getElementById(
+        "popupFacing"
+    ).innerText =
+    plot.facing || "N/A";
+
+    if(isAdmin){
+
+    document.getElementById(
+        "adminSection"
+    ).style.display = "block";
+
+}else{
+
+    document.getElementById(
+        "adminSection"
+    ).style.display = "none";
+
+}
+
+document.getElementById(
+    "plotPopup"
+).style.display = "block";
+
+}
+function setStatus(status){
+
+    if(!selectedPlot)
+        return;
+
+    selectedPlot.status = status;
+
+    savePlots();
+
+    drawPlots();
+
+    showPlotPopup(selectedPlot);
+
+}
+function saveCustomer(){
+
+    if(!selectedPlot)
+        return;
+
+    const customerName =
+    document.getElementById(
+        "customerInput"
+    ).value.trim();
+
+    selectedPlot.customer =
+    customerName;
+
+    savePlots();
+
+    showPlotPopup(
+        selectedPlot
+    );
+
+    alert(
+        "Customer Saved"
+    );
+
+}
+function closePopup(){
+
+    document.getElementById(
+        "plotPopup"
+    ).style.display = "none";
+
 }
 
 function drawPlots() {
@@ -87,15 +194,7 @@ function drawPlots() {
 
         rect.addEventListener("click", () => {
 
-            if(plot.status === "available")
-                plot.status = "booked";
-            else if(plot.status === "booked")
-                plot.status = "sold";
-            else
-                plot.status = "available";
-
-            savePlots();
-            drawPlots();
+            showPlotPopup(plot);
 
         });
 
@@ -106,9 +205,10 @@ function drawPlots() {
             "text"
         );
 
-        text.setAttribute("x", plot.x + 30);
-        text.setAttribute("y", plot.y + 45);
+        text.setAttribute("x", plot.x + 15);
+        text.setAttribute("y", plot.y + 35);
         text.setAttribute("fill", "white");
+        text.setAttribute("font-size", "18");
         text.textContent = plot.id;
 
         svg.appendChild(text);
@@ -120,6 +220,7 @@ function drawPlots() {
 
 loadPlots();
 drawPlots();
+
 svg.addEventListener("mousemove", (e) => {
 
     const point = svg.createSVGPoint();
@@ -135,44 +236,71 @@ svg.addEventListener("mousemove", (e) => {
     document.getElementById(
         "coordinates"
     ).innerText =
-        `X: ${Math.round(svgPoint.x)} | Y: ${Math.round(svgPoint.y)}`;
+    `X: ${Math.round(svgPoint.x)} | Y: ${Math.round(svgPoint.y)}`;
 
 });
-svg.addEventListener("click", (e) => {
 
-    const point = svg.createSVGPoint();
+document
+.getElementById("searchBtn")
+.addEventListener("click", () => {
 
-    point.x = e.clientX;
-    point.y = e.clientY;
+    const plotNo =
+    parseInt(
+        document.getElementById(
+            "searchPlot"
+        ).value
+    );
 
-    const svgPoint =
-        point.matrixTransform(
-            svg.getScreenCTM().inverse()
-        );
+    const plot =
+    plots.find(
+        p => p.id === plotNo
+    );
 
-    if(addPlotMode){
+    if(plot){
 
-       console.log(
-`{ id: ${nextPlotId}, x: ${Math.round(svgPoint.x)}, y: ${Math.round(svgPoint.y)}, width: 45, height: 60, status: "available" },`
-);
+        showPlotPopup(plot);
 
-nextPlotId++;
+    }else{
+
+        alert("Plot Not Found");
+
     }
 
 });
-let addPlotMode = false;
-
 document
-.getElementById("addPlotBtn")
+.getElementById("adminBtn")
 .addEventListener("click", () => {
 
-    addPlotMode = !addPlotMode;
+    const password =
+    prompt("Enter Admin Password");
 
-    document.getElementById(
-        "addPlotBtn"
-    ).innerText =
-    addPlotMode
-    ? "Add Plot Mode: ON"
-    : "Add Plot Mode: OFF";
+    if(password === "7702"){
+
+        isAdmin = true;
+
+        alert(
+            "Admin Mode Enabled"
+        );
+
+    }else{
+
+        alert(
+            "Wrong Password"
+        );
+
+    }
+
+});
+
+window.addEventListener("click", function(event){
+
+    const popup =
+    document.getElementById("plotPopup");
+
+    if(event.target === popup){
+
+        popup.style.display = "none";
+
+    }
 
 });
