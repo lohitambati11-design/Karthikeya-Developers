@@ -1,3 +1,11 @@
+import {
+    db,
+    doc,
+    setDoc,
+    collection,
+    getDocs,
+    onSnapshot
+} from "./firebase.js";
 const svg = document.getElementById("map");
 
 let isAdmin = false;
@@ -25,47 +33,105 @@ function updateCounts() {
     document.getElementById("soldCount").innerText = sold;
 }
 
-function savePlots() {
+async function savePlots() {
 
-    localStorage.setItem(
-        "nagarajukuntaPlots",
-        JSON.stringify(plots)
-    );
+    for (const plot of plots) {
 
-}
-
-function loadPlots() {
-
-    const saved = localStorage.getItem(
-        "nagarajukuntaPlots"
-    );
-
-    if(saved){
-
-        const savedPlots = JSON.parse(saved);
-
-        savedPlots.forEach(savedPlot => {
-
-            const plot = plots.find(
-                p => p.id === savedPlot.id
-            );
-
-            if(plot){
-
-                plot.status =
-savedPlot.status || "available";
-
-plot.customer =
-savedPlot.customer || "";
-
-            }
-
-        });
+        await setDoc(
+            doc(
+                db,
+                "plots",
+                String(plot.id)
+            ),
+            plot
+        );
 
     }
 
 }
 
+
+async function loadPlots() {
+
+    const snapshot =
+        await getDocs(
+            collection(
+                db,
+                "plots"
+            )
+        );
+
+    snapshot.forEach(docSnap => {
+
+        const savedPlot =
+            docSnap.data();
+
+        const plot =
+            plots.find(
+                p => p.id === savedPlot.id
+            );
+
+        if(plot){
+
+            plot.status =
+                savedPlot.status || "available";
+
+            plot.customer =
+                savedPlot.customer || "";
+
+            plot.extent =
+                savedPlot.extent || "";
+
+            plot.facing =
+                savedPlot.facing || "";
+
+        }
+
+    });
+
+    drawPlots();
+
+}
+function startRealtimeUpdates() {
+
+    onSnapshot(
+        collection(db, "plots"),
+        (snapshot) => {
+
+            snapshot.forEach(docSnap => {
+
+                const savedPlot =
+                    docSnap.data();
+
+                const plot =
+                    plots.find(
+                        p => p.id === savedPlot.id
+                    );
+
+                if(plot){
+
+                    plot.status =
+                        savedPlot.status;
+
+                    plot.customer =
+                        savedPlot.customer || "";
+
+                    plot.extent =
+                        savedPlot.extent || "";
+
+                    plot.facing =
+                        savedPlot.facing || "";
+
+                }
+
+            });
+
+            drawPlots();
+
+        }
+    );
+
+}
 function showPlotPopup(plot){
 selectedPlot = plot;
     document.getElementById(
@@ -219,7 +285,7 @@ function drawPlots() {
 }
 
 loadPlots();
-drawPlots();
+startRealtimeUpdates();
 
 svg.addEventListener("mousemove", (e) => {
 

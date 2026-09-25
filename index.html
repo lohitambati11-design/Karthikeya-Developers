@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Veerabhadrapuram Layout</title>
+<title>Nagarajukunta Phase 2 Layout</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -32,6 +32,9 @@
         <button id="searchBtn">
             Search Plot
         </button>
+        <button onclick="uploadPlots()">
+    Upload Plots To Firebase
+</button>
         <button id="adminBtn">
     Admin Login
 </button>
@@ -138,7 +141,12 @@
 </div>
 
 <script src="plots.js"></script>
-<script src="app.js"></script>
+
+<script type="module" src="firebase.js"></script>
+
+<script type="module" src="uploadPlots.js"></script>
+
+<script type="module" src="app.js"></script>
 
 </body>
 </html>
