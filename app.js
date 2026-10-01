@@ -12,6 +12,7 @@ const svg = document.getElementById("map");
 let isAdmin = false;
 let selectedPlot = null;
 
+
 /* ==========================
    COUNTERS
 ========================== */
@@ -24,11 +25,13 @@ function updateCounts() {
 
     plots.forEach(plot => {
 
-        if(plot.status === "available")
+        if (plot.status === "available")
             available++;
-        else if(plot.status === "booked")
+
+        else if (plot.status === "booked")
             booked++;
-        else if(plot.status === "sold")
+
+        else if (plot.status === "sold")
             sold++;
 
     });
@@ -37,6 +40,7 @@ function updateCounts() {
     document.getElementById("bookedCount").innerText = booked;
     document.getElementById("soldCount").innerText = sold;
 }
+
 
 /* ==========================
    FIREBASE SAVE
@@ -54,6 +58,7 @@ async function savePlots() {
     }
 
 }
+
 
 /* ==========================
    FIREBASE LOAD
@@ -73,7 +78,7 @@ async function loadPlots() {
             p => p.id === savedPlot.id
         );
 
-        if(plot){
+        if (plot) {
 
             plot.status =
                 savedPlot.status || "available";
@@ -95,6 +100,7 @@ async function loadPlots() {
 
 }
 
+
 /* ==========================
    REALTIME UPDATES
 ========================== */
@@ -107,25 +113,31 @@ function startRealtimeUpdates() {
 
             snapshot.forEach(docSnap => {
 
-                const savedPlot = docSnap.data();
+                const savedPlot =
+                    docSnap.data();
 
-                const plot = plots.find(
-                    p => p.id === savedPlot.id
-                );
+                const plot =
+                    plots.find(
+                        p => p.id === savedPlot.id
+                    );
 
-                if(plot){
+                if (plot) {
 
                     plot.status =
-                        savedPlot.status || "available";
+                        savedPlot.status ||
+                        "available";
 
                     plot.customer =
-                        savedPlot.customer || "";
+                        savedPlot.customer ||
+                        "";
 
                     plot.extent =
-                        savedPlot.extent || "";
+                        savedPlot.extent ||
+                        "";
 
                     plot.facing =
-                        savedPlot.facing || "";
+                        savedPlot.facing ||
+                        "";
 
                 }
 
@@ -138,11 +150,12 @@ function startRealtimeUpdates() {
 
 }
 
+
 /* ==========================
    POPUP
 ========================== */
 
-function showPlotPopup(plot){
+function showPlotPopup(plot) {
 
     selectedPlot = plot;
 
@@ -156,33 +169,42 @@ function showPlotPopup(plot){
 
     document.getElementById(
         "popupCustomer"
-    ).innerText = plot.customer || "";
+    ).innerText =
+        plot.customer || "";
 
     document.getElementById(
         "popupExtent"
-    ).innerText = plot.extent || "";
+    ).innerText =
+        plot.extent || "";
 
     document.getElementById(
         "popupFacing"
-    ).innerText = plot.facing || "";
+    ).innerText =
+        plot.facing || "";
+
 
     const customerInput =
         document.getElementById(
             "customerInput"
         );
 
-    if(customerInput){
+    if (customerInput) {
+
         customerInput.value =
             plot.customer || "";
+
     }
 
-    if(isAdmin){
+
+    if (isAdmin) {
 
         document.getElementById(
             "adminSection"
         ).style.display = "block";
 
-    }else{
+    }
+
+    else {
 
         document.getElementById(
             "adminSection"
@@ -190,109 +212,246 @@ function showPlotPopup(plot){
 
     }
 
+
     document.getElementById(
         "plotPopup"
     ).style.display = "block";
 
 }
 
-function closePopup(){
+
+/* ==========================
+   CLOSE POPUP
+========================== */
+
+function closePopup() {
 
     document.getElementById(
         "plotPopup"
     ).style.display = "none";
 
+    selectedPlot = null;
+
 }
 
+
 /* ==========================
-   ADMIN FUNCTIONS
+   ADMIN - SAVE CUSTOMER
 ========================== */
 
-async function saveCustomer(){
+async function saveCustomer() {
 
-    if(!selectedPlot)
+    if (!selectedPlot)
         return;
 
+
     const customerName =
-    document.getElementById(
-        "customerInput"
-    ).value.trim();
+        document.getElementById(
+            "customerInput"
+        ).value.trim();
+
 
     selectedPlot.customer =
-    customerName;
+        customerName;
+
 
     await savePlots();
 
+
     document.getElementById(
         "popupCustomer"
-    ).innerText = customerName;
+    ).innerText =
+        customerName;
+
 
     await loadPlots();
+
 
     alert("Customer Saved");
 
 }
 
-async function setStatus(status){
 
-    if(!selectedPlot)
+/* ==========================
+   ADMIN - CHANGE STATUS
+========================== */
+
+async function setStatus(status) {
+
+    if (!selectedPlot)
         return;
 
-    selectedPlot.status = status;
+
+    selectedPlot.status =
+        status;
+
 
     await savePlots();
 
+
     document.getElementById(
         "popupStatus"
-    ).innerText = status;
+    ).innerText =
+        status;
+
 
     drawPlots();
 
 }
 
 
-
-/* ==========================
+/* =========================================================
    DRAW PLOTS
-========================== */
+   =========================================================
+   
+   RECTANGLE:
+   If plot.type is NOT "polygon",
+   the existing x/y/width/height system is used.
+
+   POLYGON:
+   Only plots with type: "polygon"
+   use their points.
+========================================================= */
 
 function drawPlots() {
 
     svg.innerHTML = "";
 
+
     plots.forEach(plot => {
 
-        const rect =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "rect"
+        let shape;
+
+
+        /* =================================================
+           POLYGON PLOT
+           ================================================= */
+
+        if (plot.type === "polygon") {
+
+            shape =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "polygon"
+                );
+
+
+            shape.setAttribute(
+                "points",
+                plot.points
             );
 
-        rect.setAttribute("x", plot.x);
-        rect.setAttribute("y", plot.y);
-        rect.setAttribute("width", plot.width);
-        rect.setAttribute("height", plot.height);
+        }
+
+
+        /* =================================================
+           NORMAL RECTANGLE PLOT
+           ================================================= */
+
+        else {
+
+            shape =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "rect"
+                );
+
+
+            shape.setAttribute(
+                "x",
+                plot.x
+            );
+
+
+            shape.setAttribute(
+                "y",
+                plot.y
+            );
+
+
+            shape.setAttribute(
+                "width",
+                plot.width
+            );
+
+
+            shape.setAttribute(
+                "height",
+                plot.height
+            );
+
+        }
+
+
+        /* =================================================
+           PLOT COLOR
+           ================================================= */
 
         let color = "green";
 
-        if(plot.status === "booked")
+
+        if (plot.status === "booked") {
+
             color = "yellow";
 
-        if(plot.status === "sold")
+        }
+
+
+        if (plot.status === "sold") {
+
             color = "red";
 
-        rect.setAttribute("fill", color);
-        rect.setAttribute("stroke", "black");
-        rect.setAttribute("fill-opacity", "0.7");
-        rect.setAttribute("stroke-width", "3");
+        }
 
-        rect.addEventListener("click", () => {
 
-            showPlotPopup(plot);
+        shape.setAttribute(
+            "fill",
+            color
+        );
 
-        });
 
-        svg.appendChild(rect);
+        shape.setAttribute(
+            "stroke",
+            "black"
+        );
+
+
+        shape.setAttribute(
+            "fill-opacity",
+            "0.7"
+        );
+
+
+        shape.setAttribute(
+            "stroke-width",
+            "3"
+        );
+
+
+        shape.style.cursor =
+            "pointer";
+
+
+        /* =================================================
+           CLICK PLOT
+           ================================================= */
+
+        shape.addEventListener(
+            "click",
+            () => {
+
+                showPlotPopup(plot);
+
+            }
+        );
+
+
+        svg.appendChild(shape);
+
+
+        /* =================================================
+           PLOT NUMBER
+           ================================================= */
 
         const text =
             document.createElementNS(
@@ -300,53 +459,252 @@ function drawPlots() {
                 "text"
             );
 
+
+        let centerX;
+        let centerY;
+
+
+        /* =================================================
+           POLYGON CENTER
+           ================================================= */
+
+        if (plot.type === "polygon") {
+
+            const coords =
+                plot.points
+                    .trim()
+                    .split(/\s+/)
+                    .map(point => {
+
+                        const values =
+                            point
+                                .split(",")
+                                .map(Number);
+
+                        return {
+                            x: values[0],
+                            y: values[1]
+                        };
+
+                    });
+
+
+            if (coords.length < 3) {
+
+                console.warn(
+                    "Invalid polygon for plot:",
+                    plot.id
+                );
+
+                return;
+
+            }
+
+
+            let area = 0;
+
+            let centroidX = 0;
+
+            let centroidY = 0;
+
+
+            for (
+                let i = 0;
+                i < coords.length;
+                i++
+            ) {
+
+                const current =
+                    coords[i];
+
+                const next =
+                    coords[
+                        (i + 1) %
+                        coords.length
+                    ];
+
+
+                const cross =
+                    current.x * next.y -
+                    next.x * current.y;
+
+
+                area += cross;
+
+
+                centroidX +=
+                    (current.x + next.x) *
+                    cross;
+
+
+                centroidY +=
+                    (current.y + next.y) *
+                    cross;
+
+            }
+
+
+            area =
+                area / 2;
+
+
+            if (
+                Math.abs(area) > 0.001
+            ) {
+
+                centerX =
+                    centroidX /
+                    (6 * area);
+
+
+                centerY =
+                    centroidY /
+                    (6 * area);
+
+            }
+
+            else {
+
+                centerX =
+                    coords.reduce(
+                        (sum, point) =>
+                            sum + point.x,
+                        0
+                    ) /
+                    coords.length;
+
+
+                centerY =
+                    coords.reduce(
+                        (sum, point) =>
+                            sum + point.y,
+                        0
+                    ) /
+                    coords.length;
+
+            }
+
+        }
+
+
+        /* =================================================
+           RECTANGLE CENTER
+           ================================================= */
+
+        else {
+
+            centerX =
+                plot.x +
+                (plot.width / 2);
+
+
+            centerY =
+                plot.y +
+                (plot.height / 2);
+
+        }
+
+
+        /* =================================================
+           NUMBER POSITION
+           ================================================= */
+
         text.setAttribute(
             "x",
-            plot.x + (plot.width / 2)
+            centerX
         );
+
 
         text.setAttribute(
             "y",
-            plot.y + (plot.height / 2)
+            centerY
         );
+
 
         text.setAttribute(
             "text-anchor",
             "middle"
         );
 
+
         text.setAttribute(
             "dominant-baseline",
             "middle"
         );
+
+
+        /* =================================================
+           NUMBER STYLE
+           ================================================= */
 
         text.setAttribute(
             "fill",
             "white"
         );
 
+
         text.setAttribute(
             "font-size",
             "18"
         );
 
+
+        text.setAttribute(
+            "font-weight",
+            "bold"
+        );
+
+
+        text.setAttribute(
+            "stroke",
+            "black"
+        );
+
+
+        text.setAttribute(
+            "stroke-width",
+            "1.5"
+        );
+
+
+        text.setAttribute(
+            "paint-order",
+            "stroke"
+        );
+
+
         text.textContent =
             plot.id;
+
+
+        /*
+           Important:
+           Clicking the number should still
+           click the plot underneath.
+        */
+
+        text.style.pointerEvents =
+            "none";
+
 
         svg.appendChild(text);
 
     });
 
+
     updateCounts();
 
 }
+
 
 /* ==========================
    INITIAL LOAD
 ========================== */
 
 loadPlots();
+
 startRealtimeUpdates();
+
 
 /* ==========================
    COORDINATES
@@ -359,13 +717,21 @@ svg.addEventListener(
         const point =
             svg.createSVGPoint();
 
-        point.x = e.clientX;
-        point.y = e.clientY;
+
+        point.x =
+            e.clientX;
+
+        point.y =
+            e.clientY;
+
 
         const svgPoint =
             point.matrixTransform(
-                svg.getScreenCTM().inverse()
+                svg
+                    .getScreenCTM()
+                    .inverse()
             );
+
 
         document.getElementById(
             "coordinates"
@@ -375,68 +741,87 @@ svg.addEventListener(
     }
 );
 
+
 /* ==========================
    SEARCH
 ========================== */
 
 document
-.getElementById("searchBtn")
-.addEventListener("click", () => {
+    .getElementById("searchBtn")
+    .addEventListener(
+        "click",
+        () => {
 
-    const plotNo =
-        parseInt(
-            document.getElementById(
-                "searchPlot"
-            ).value
-        );
+            const plotNo =
+                parseInt(
+                    document.getElementById(
+                        "searchPlot"
+                    ).value
+                );
 
-    const plot =
-        plots.find(
-            p => p.id === plotNo
-        );
 
-    if(plot){
+            const plot =
+                plots.find(
+                    p => p.id === plotNo
+                );
 
-        showPlotPopup(plot);
 
-    }else{
+            if (plot) {
 
-        alert("Plot Not Found");
+                showPlotPopup(plot);
 
-    }
+            }
 
-});
+            else {
+
+                alert(
+                    "Plot Not Found"
+                );
+
+            }
+
+        }
+    );
+
 
 /* ==========================
    ADMIN LOGIN
 ========================== */
 
 document
-.getElementById("adminBtn")
-.addEventListener("click", () => {
+    .getElementById("adminBtn")
+    .addEventListener(
+        "click",
+        () => {
 
-    const password =
-        prompt(
-            "Enter Admin Password"
-        );
+            const password =
+                prompt(
+                    "Enter Admin Password"
+                );
 
-    if(password === "7702"){
 
-        isAdmin = true;
+            if (password === "7702") {
 
-        alert(
-            "Admin Mode Enabled"
-        );
+                isAdmin = true;
 
-    }else{
 
-        alert(
-            "Wrong Password"
-        );
+                alert(
+                    "Admin Mode Enabled"
+                );
 
-    }
+            }
 
-});
+            else {
+
+                alert(
+                    "Wrong Password"
+                );
+
+            }
+
+        }
+    );
+
 
 /* ==========================
    OUTSIDE CLICK CLOSE
@@ -444,27 +829,36 @@ document
 
 window.addEventListener(
     "click",
-    function(event){
+    function (event) {
 
         const popup =
             document.getElementById(
                 "plotPopup"
             );
 
-        if(event.target === popup){
+
+        if (event.target === popup) {
 
             popup.style.display =
                 "none";
+
+            selectedPlot = null;
 
         }
 
     }
 );
 
+
 /* ==========================
    GLOBAL FUNCTIONS
 ========================== */
 
-window.closePopup = closePopup;
-window.saveCustomer = saveCustomer;
-window.setStatus = setStatus;
+window.closePopup =
+    closePopup;
+
+window.saveCustomer =
+    saveCustomer;
+
+window.setStatus =
+    setStatus;
