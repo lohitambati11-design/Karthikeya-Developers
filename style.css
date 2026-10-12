@@ -130,3 +130,79 @@ rect{
 .sold{
     background:red;
 }
+/* Toolbar layout */
+.toolbar {
+    background: #1f2937;
+    color: white;
+    padding: 12px;
+    text-align: center;
+}
+
+.toolbar h2 {
+    margin: 0 0 10px;
+    font-size: 24px;
+}
+
+/* Total plots */
+.total-plots {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 10px 0 14px;
+    color: #ffffff;
+}
+
+/* Center the three count boxes */
+.plot-counts {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    margin: 0 auto 10px;
+    flex-wrap: wrap;
+}
+
+/* Individual count boxes */
+.count-box {
+    min-width: 150px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-sizing: border-box;
+}
+
+/* Larger labels */
+.count-label {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Larger count numbers */
+.count-box span:last-child {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+/* Box colours */
+.available-box {
+    background: #15803d;
+}
+
+.booked-box {
+    background: #ca8a04;
+    color: white;
+}
+
+.sold-box {
+    background: #dc2626;
+}
+
+/* Keep coordinates visible */
+#coordinates {
+    display: inline-block;
+    margin: 8px auto;
+}

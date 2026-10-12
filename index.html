@@ -10,17 +10,37 @@
 <body>
 
 <div class="toolbar">
+
     <h2>Nagarajukunta Phase 2 Layout</h2>
 
-    <div>
-        Available: <span id="availableCount">5</span> |
-        Booked: <span id="bookedCount">0</span> |
-        Sold: <span id="soldCount">0</span>
+    <div class="total-plots">
+        Total Plots: 144
+    </div>
+
+    <div class="plot-counts">
+        <div class="count-box available-box">
+            <span class="count-label">Available</span>
+            <span id="availableCount">0</span>
+        </div>
+
+        <div class="count-box booked-box">
+            <span class="count-label">Booked</span>
+            <span id="bookedCount">0</span>
+        </div>
+
+        <div class="count-box sold-box">
+            <span class="count-label">Sold</span>
+            <span id="soldCount">0</span>
+        </div>
     </div>
 
     <div id="coordinates">
         X: 0 | Y: 0
     </div>
+
+    <!-- Keep your existing search and admin login elements here -->
+
+
 
     <div style="margin-top:10px;">
 
